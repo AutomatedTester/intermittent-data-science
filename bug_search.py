@@ -21,7 +21,7 @@ def date_as_of(days):
     return tday - datetime.timedelta(days=days)
 
 def amount_of_comments_per_bug():
-    bugs = get_intermittents_created_in_last(60)
+    bugs = get_intermittents_created_in_last(120)
     comment_breakdown = {}
     ready_to_close = []
     thirty_days = date_as_of(30)
