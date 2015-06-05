@@ -24,11 +24,12 @@ def amount_of_comments_per_bug():
     bugs = get_intermittents_created_in_last(120)
     comment_breakdown = {}
     ready_to_close = []
-    thirty_days = date_as_of(45)
+    thirty_days = date_as_of(30)
     for bug in bugs:
         if bug.product == "Thunderbird" \
             or bug.status.upper() == "RESOLVED"\
-            or "[leave open]" in bug._bug["whiteboard"]:
+            or "[leave open]" in bug._bug["whiteboard"]
+            or "orange-bomb" in bug._bug["whiteboard"]:
             continue
         comments = bug.get_comments()
 
@@ -59,7 +60,8 @@ def bugs_possibly_ready_to_close():
     for bug in bugs:
         if bug.product == "Thunderbird" \
             or bug.status.upper() == "RESOLVED" \
-            or "[leave open]" in bug._bug["whiteboard"]:
+            or "[leave open]" in bug._bug["whiteboard"]\
+            or "orange-bomb" in bug._bug["whiteboard"]:
             continue
         comments = bug.get_comments()
 
