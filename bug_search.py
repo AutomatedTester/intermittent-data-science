@@ -24,9 +24,11 @@ def amount_of_comments_per_bug():
     bugs = get_intermittents_created_in_last(120)
     comment_breakdown = {}
     ready_to_close = []
-    thirty_days = date_as_of(30)
+    thirty_days = date_as_of(45)
     for bug in bugs:
-        if bug.product == "Thunderbird" or bug.status.upper() == "RESOLVED":
+        if bug.product == "Thunderbird" \
+            or bug.status.upper() == "RESOLVED"\
+            or "[leave open]" in bug._bug["whiteboard"]:
             continue
         comments = bug.get_comments()
 
@@ -44,10 +46,35 @@ def amount_of_comments_per_bug():
     ordered_breakdown = collections.OrderedDict(sorted(comment_breakdown.items()))
     for count, bug_array in ordered_breakdown.iteritems():
         pass
-        #print("Bugs %s had %s comments" % (bug_array, count))
+        print("Bugs %s had %s comments" % (bug_array, count))
 
     print("The following bugs can be closed %s" % ready_to_close)
 
 
+def bugs_possibly_ready_to_close():
+    bugs = get_intermittents_created_in_last(120)
+    ready_to_close = []
+    bugs_to_review = []
+    fortyfive_days = date_as_of(45)
+    for bug in bugs:
+        if bug.product == "Thunderbird" \
+            or bug.status.upper() == "RESOLVED" \
+            or "[leave open]" in bug._bug["whiteboard"]:
+            continue
+        comments = bug.get_comments()
+
+        delta = fortyfive_days - comments[-1].creation_time
+        if "tbpl" in comments[-1].author and delta.days >= 0:
+            ready_to_close.append(bug.id)
+            for comment in comments:
+                if "disabled" in comment.text.lower():
+                    bugs_to_review.append(bug.id)
+                    break
+
+    print("The following bugs can be closed %s" % ready_to_close)
+    print("*****************************************************")
+    print("The following bugs need to be reviewed %s" % set(bugs_to_review))
+
 if __name__ == '__main__':
-    amount_of_comments_per_bug()
+    bugs_possibly_ready_to_close()
+    #amount_of_comments_per_bug()
